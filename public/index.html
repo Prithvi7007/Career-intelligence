@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090f1b">
+  <title>Career Intelligence · Control Room</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">✳</div><div><strong>CAREER<span>IQ</span></strong><small>YOUR CAREER OS</small></div></div>
+    <div class="side-heading">WORKSPACE</div>
+    <nav class="navigation" aria-label="Primary navigation">
+      <button class="nav active" type="button" data-page="overview"><span>◫</span> Overview</button>
+      <button class="nav" type="button" data-page="opportunities"><span>◈</span> Opportunities</button>
+      <button class="nav" type="button" data-page="pipeline"><span>▥</span> My pipeline</button>
+      <button class="nav" type="button" data-page="insights"><span>⌁</span> Insights</button>
+    </nav>
+    <div class="side-foot"><div class="side-foot-icon">◎</div><div><b>Private workspace</b><small>Local by default · Your data</small></div></div>
+  </aside>
+
+  <main class="workspace">
+    <header class="topbar">
+      <div class="breadcrumb">PERSONAL WORKSPACE <span>/</span> <b id="crumb">OVERVIEW</b></div>
+      <div class="top-right"><span id="connection" class="connection"><i></i> Connecting…</span><div class="avatar">CI</div></div>
+    </header>
+    <div class="content">
+      <div class="eyebrow"><span class="green-dot"></span> INTELLIGENCE WORKSPACE <span id="today" class="today"></span></div>
+      <section class="hero">
+        <div><h1 id="hero-title">Your next move,<br><em>made smarter.</em></h1><p id="hero-description">Discover better opportunities, keep your search focused, and move with clarity.</p></div>
+        <div class="hero-actions"><button id="scan" class="button secondary" type="button">↻ Scan portals</button><button id="add" class="button primary" type="button">＋ Add opportunity</button></div>
+      </section>
+      <div id="notice" class="notice" role="status" hidden></div>
+      <section class="metrics" aria-label="Career metrics">
+        <article class="metric"><span class="metric-glyph lilac">◇</span><h2>TOTAL OPPORTUNITIES</h2><strong id="total">—</strong><p>Across your workspace</p></article>
+        <article class="metric"><span class="metric-glyph mint">↗</span><h2>STRONG MATCHES</h2><strong id="strong">—</strong><p>Scored 4.0 / 5 or higher</p></article>
+        <article class="metric"><span class="metric-glyph amber">◉</span><h2>IN PROCESS</h2><strong id="active">—</strong><p>Applied through interview</p></article>
+        <article class="metric"><span class="metric-glyph blue">▧</span><h2>TO EVALUATE</h2><strong id="review">—</strong><p>Saved and newly discovered</p></article>
+      </section>
+      <div class="dashboard">
+        <section class="panel main-panel">
+          <div class="panel-heading"><div><h2 id="list-heading">Opportunity feed</h2><p id="list-subheading">A single view of everything worth considering.</p></div><span class="count" id="count">0 roles</span></div>
+          <div class="filters">
+            <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Search jobs, companies, locations..." aria-label="Search jobs"></label>
+            <select id="stage" aria-label="Filter by stage"><option value="all">All stages</option><option>New</option><option>Saved</option><option>Evaluated</option><option>Applied</option><option>Interview</option><option>Offer</option></select>
+            <select id="sort" aria-label="Sort jobs"><option value="recent">Recently added</option><option value="match">Highest match</option><option value="company">Company A–Z</option></select>
+          </div>
+          <div class="jobs" id="jobs"></div>
+          <div class="panel-footer"><span id="result-count">0 opportunities</span><button class="link-button" id="demo" type="button">Explore example data</button></div>
+        </section>
+        <aside class="panel sidebar-panel">
+          <h2 class="small-heading"><span class="green-dot"></span> YOUR SEARCH PULSE</h2>
+          <div class="progress"><div class="progress-top">Search progress <b id="rate">0%</b></div><div class="progress-track"><div id="progress-bar"></div></div><p id="progress-description">Applications you have sent, compared with saved and evaluated roles.</p></div>
+          <div class="rule"></div>
+          <h2 class="small-heading">NEXT BEST ACTION</h2>
+          <div class="tip"><span>✦</span><h3 id="tip-title">Start with one role</h3><p id="tip-description">Add a role you are considering or connect Career-Ops to discover more.</p></div>
+          <div class="rule"></div>
+          <h2 class="small-heading">ENGINE STATUS</h2>
+          <div class="engine-row"><span>Career-Ops core</span><b id="core-status">Not connected</b></div>
+          <div class="engine-row"><span>Portal scan</span><b id="scan-status">Idle</b></div>
+          <p class="aside-note">This dashboard does not perform AI evaluations. Match scores appear only after a real Career-Ops assessment.</p>
+        </aside>
+      </div>
+      <footer>CAREER INTELLIGENCE <span>·</span> CONTROL ROOM V0.1 <strong>Own your next chapter.</strong></footer>
+    </div>
+  </main>
+</div>
+<dialog id="dialog">
+  <form id="lead-form" method="dialog">
+    <div class="eyebrow">NEW OPPORTUNITY</div>
+    <h2>Add a role to your radar</h2>
+    <p>Save a job you want to revisit. No application is submitted.</p>
+    <label>Job title <input id="job-title" required maxlength="160" placeholder="Senior Data Scientist"></label>
+    <label>Company <input id="company" required maxlength="120" placeholder="Company name"></label>
+    <label>Job posting URL <small>(optional)</small><input id="job-url" type="url" placeholder="https://company.com/careers/..."></label>
+    <div class="form-grid"><label>Location <input id="location" maxlength="160" placeholder="Remote / Orlando"></label><label>Priority <select id="priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></label></div>
+    <div class="dialog-actions"><button id="cancel" class="button secondary" type="button">Cancel</button><button type="submit" class="button primary">Save opportunity</button></div>
+  </form>
+</dialog>
+</body>
+</html>
