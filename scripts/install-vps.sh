@@ -15,6 +15,8 @@ stage=""
 installed=0
 succeeded=0
 
+# Git checks are scoped to this known bridge checkout: no root-wide safe.directory changes.
+repo_git() { git -c "safe.directory=$CHECKOUT" -C "$CHECKOUT" "$@"; }
 say() { printf 'Career Intelligence: %s\n' "$*"; }
 fail() { printf 'Career Intelligence: ERROR: %s\n' "$*" >&2; exit 1; }
 
@@ -40,15 +42,15 @@ done
 systemctl cat "$APP.service" >/dev/null 2>&1 && fail "The $APP service is already registered. Refusing to overwrite."
 
 [[ -d "$CHECKOUT/.git" ]] || fail 'Run from a Git checkout of Career Intelligence.'
-origin="$(git -C "$CHECKOUT" remote get-url origin)"
+origin="$(repo_git remote get-url origin)"
 case "$origin" in
   "$SOURCE_REPO"|"https://github.com/Prithvi7007/Career-intelligence"|"git@github.com:Prithvi7007/Career-intelligence.git") ;;
   *) fail "Unexpected source repository. Expected $SOURCE_REPO" ;;
 esac
-[[ "$(git -C "$CHECKOUT" branch --show-current)" == main ]] || fail 'Checkout must be on the reviewed main branch.'
-[[ -z "$(git -C "$CHECKOUT" status --porcelain)" ]] || fail 'Checkout has local changes. Refusing an unreviewed deployment.'
-main_sha="$(git -C "$CHECKOUT" rev-parse HEAD)"
-remote_sha="$(git -C "$CHECKOUT" rev-parse --verify refs/remotes/origin/main)"
+[[ "$(repo_git branch --show-current)" == main ]] || fail 'Checkout must be on the reviewed main branch.'
+[[ -z "$(repo_git status --porcelain)" ]] || fail 'Checkout has local changes. Refusing an unreviewed deployment.'
+main_sha="$(repo_git rev-parse HEAD)"
+remote_sha="$(repo_git rev-parse --verify refs/remotes/origin/main)"
 [[ "$main_sha" == "$remote_sha" ]] || fail 'Checkout is not at origin/main. Fetch and fast-forward before installation.'
 [[ -f "$CHECKOUT/server.mjs" && -f "$CHECKOUT/deploy/career-intelligence.service" ]] || fail 'Missing reviewed application or systemd unit.'
 
@@ -69,7 +71,7 @@ runuser -u "$APP" -- "$node_path" --version >/dev/null \
   || fail 'Node is not accessible to the unprivileged service account (e.g. installed under /root/.nvm). Use a system-wide Node.js installation.'
 
 stage="$(mktemp -d /opt/.career-intelligence-install.XXXXXXXX)"
-git -C "$CHECKOUT" archive --format=tar HEAD | tar -x -f - -C "$stage"
+repo_git archive --format=tar HEAD | tar -x -f - -C "$stage"
 [[ -f "$stage/server.mjs" && -f "$stage/public/index.html" ]] || fail 'Missing application files in reviewed archive.'
 "$node_path" --check "$stage/server.mjs"
 "$node_path" --check "$stage/public/app.js"

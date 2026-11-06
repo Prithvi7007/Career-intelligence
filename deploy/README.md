@@ -21,11 +21,20 @@ Run on the VPS after merging the deployment PR:
 
 ```bash
 cd /opt/crew-dev-bridge/career-source
-git status --short
-git checkout main
-git pull --ff-only origin main
+# Bootstrap owns this checkout as UID 10001. Do not run Git here as root.
+sudo -u '#10001' git status --short
+sudo -u '#10001' git checkout main
+sudo -u '#10001' git pull --ff-only origin main
 sudo bash scripts/install-vps.sh
 ```
+
+The installer uses a **per-command Git safe.directory** setting for the
+one allowlisted checkout to read its metadata as root, rather than adding
+a persistent root-wide Git trust exception. Run checkout/pull as UID 10001
+(the owner assigned by the CREW Development Bridge bootstrap) to preserve
+normal file ownership. If this checkout is owned by a different UID, verify
+the owner with `stat -c '%u' /opt/crew-dev-bridge/career-source` before
+using its numeric UID.
 
 The installer validates the checkout's origin, cleanliness and match to
 `origin/main`; checks system-wide Node compatibility; archives the reviewed Git
