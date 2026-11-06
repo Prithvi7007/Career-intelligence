@@ -1,0 +1,77 @@
+# Career Intelligence initial discovery configuration.
+# Based on provider entries verified in career-ops-hq/career-ops
+# templates/portals.example.yml at pinned source revision.
+# No AI, credentials, personal CV or automated application submission.
+#
+# This is an initial, editable shortlist. It is NOT a complete job search.
+# No restrictive location or visa filters are applied: review eligibility
+# and work authorization on each listing before applying.
+
+title_filter:
+  positive:
+    - "Data Scientist"
+    - "Data Science"
+    - "Applied Scientist"
+    - "Marketing Science"
+    - "Marketing Scientist"
+    - "Marketing Analytics"
+    - "Measurement"
+    - "Decision Scientist"
+    - "Experimentation"
+    - "Causal Inference"
+    - "Econometric"
+    - "Machine Learning"
+    - "ML Engineer"
+    - "AI Engineer"
+    - "AI Scientist"
+    - "Optimization"
+  negative:
+    - "word:Intern"
+    - "Internship"
+    - "Working Student"
+
+# Search queries in upstream Career-Ops require a separate web-search adapter.
+# API-backed employer boards are enabled first for a token-free starting point.
+search_queries: []
+job_boards: []
+
+tracked_companies:
+  - name: Anthropic
+    careers_url: https://job-boards.greenhouse.io/anthropic
+    api: https://boards-api.greenhouse.io/v1/boards/anthropic/jobs
+    enabled: true
+  - name: Airtable
+    careers_url: https://job-boards.greenhouse.io/airtable
+    api: https://boards-api.greenhouse.io/v1/boards/airtable/jobs
+    enabled: true
+  - name: Vercel
+    careers_url: https://job-boards.greenhouse.io/vercel
+    api: https://boards-api.greenhouse.io/v1/boards/vercel/jobs
+    enabled: true
+  - name: Arize AI
+    careers_url: https://job-boards.greenhouse.io/arizeai
+    api: https://boards-api.greenhouse.io/v1/boards/arizeai/jobs
+    enabled: true
+  - name: Glean
+    careers_url: https://job-boards.greenhouse.io/gleanwork
+    api: https://boards-api.greenhouse.io/v1/boards/gleanwork/jobs
+    enabled: true
+  - name: Hightouch
+    careers_url: https://job-boards.greenhouse.io/hightouch
+    api: https://boards-api.greenhouse.io/v1/boards/hightouch/jobs
+    enabled: true
+  - name: LangChain
+    careers_url: https://jobs.ashbyhq.com/langchain
+    enabled: true
+  - name: Pinecone
+    careers_url: https://jobs.ashbyhq.com/pinecone
+    enabled: true
+  - name: Temporal
+    careers_url: https://jobs.ashbyhq.com/temporal
+    enabled: true
+  - name: Cohere
+    careers_url: https://jobs.ashbyhq.com/cohere
+    enabled: true
+  - name: Runway
+    careers_url: https://jobs.ashbyhq.com/runway-ml
+    enabled: true
