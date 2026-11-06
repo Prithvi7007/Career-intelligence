@@ -69,10 +69,11 @@ data science, marketing science, applied AI, machine learning, measurement,
 optimization and experimentation. It does not impose strict location or
 sponsorship filters, so manually verify eligibility before applying.
 
-The dashboard currently invokes the upstream --verify flag, which uses
-API-first posting liveness checks with optional Playwright fallback. Browser
-fallback is not installed by this connector. If scan errors mention browser
-support, inspect the service journal before installing more packages.
+The initial dashboard invoked --verify, which can request Chromium browser
+fallback on ambiguous API responses. Discovery-first scanning is available
+in the subsequent SCAN_RECOVERY.md update; verification becomes optional.
+Inspect the service journal and the dashboard's scan error details if an
+expanded scan fails.
 
 For diagnostics:
 

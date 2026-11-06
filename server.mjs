@@ -6,6 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { STATUSES, readCore, readLeads, writeLeads, normalizeLead, combine } from './core.mjs';
 import { readDiscoveryAudit } from './scan-audit.mjs';
+import { buildScanArgs, shouldVerifyPostings } from './scan-options.mjs';
 
 const HOME = path.dirname(fileURLToPath(import.meta.url));
 const HOST = process.env.HOST || '127.0.0.1';
@@ -13,9 +14,11 @@ const PORT = Number(process.env.PORT || 3417);
 const DATA_FILE = path.resolve(process.env.CAREER_INTELLIGENCE_DATA || path.join(HOME, 'data/leads.json'));
 const ROOT = process.env.CAREER_OPS_ROOT ? path.resolve(process.env.CAREER_OPS_ROOT) : '';
 const SCAN_TIMEOUT_MS = Number(process.env.CAREER_SCAN_TIMEOUT_MS) > 0 ? Number(process.env.CAREER_SCAN_TIMEOUT_MS) : 1200000;
+const VERIFY_POSTINGS = shouldVerifyPostings(process.env.CAREER_SCAN_VERIFY);
+const SCAN_MODE = VERIFY_POSTINGS ? 'verified' : 'discovery';
 const CODE = process.env.CAREER_OPS_CODE_ROOT ? path.resolve(process.env.CAREER_OPS_CODE_ROOT) : ROOT;
 const STATIC = { '/': ['index.html','text/html; charset=utf-8'], '/app.js': ['app.js','text/javascript; charset=utf-8'], '/style.css': ['style.css','text/css; charset=utf-8'], '/audit.css': ['audit.css','text/css; charset=utf-8'] };
-let scan = { status: 'idle', message: 'No scan started', completedAt: null };
+let scan = { status: 'idle', message: 'No scan started', completedAt: null, mode: SCAN_MODE };
 let writeQueue = Promise.resolve();
 
 function response(res, status, obj) {
@@ -55,22 +58,33 @@ async function getState() {
   return { configured:core.configured, jobs:combine(core,leads), scan, audit, statuses:STATUSES };
 }
 function startScan() {
-  scan = {status:'running', message:'Scanning configured portals...', completedAt:null};
-  const child = spawn(process.execPath, [path.join(CODE,'scan.mjs'),'--verify','--quiet'], {
+  scan = {status:'running', message:VERIFY_POSTINGS ? 'Scanning and verifying postings...' : 'Discovering postings without browser verification...', completedAt:null, mode:SCAN_MODE};
+  const child = spawn(process.execPath, [path.join(CODE,'scan.mjs'), ...buildScanArgs(VERIFY_POSTINGS)], {
     cwd:CODE, stdio:['ignore','pipe','pipe'], env:{...process.env, CAREER_OPS_ROOT:ROOT}
   });
   let log = '', done = false;
   const collect = data => {log=(log+data.toString()).slice(-3000);};
   child.stdout.on('data',collect);
   child.stderr.on('data',collect);
-  const timeout=setTimeout(()=>child.kill('SIGTERM'), SCAN_TIMEOUT_MS);
+  let timedOut = false;
+  const timeout=setTimeout(()=>{ timedOut=true; child.kill('SIGTERM'); }, SCAN_TIMEOUT_MS);
   child.on('error',e=>finish('error',e.message));
-  child.on('close',code=>finish(code===0?'complete':'error',(log.trim()||('Scanner exited '+code)).slice(-650)));
+  child.on('close',(code,signal)=>{
+    const text=log.trim() || ('Scanner exited '+String(code ?? signal));
+    const message=timedOut
+      ? 'Scanner timed out after '+Math.ceil(SCAN_TIMEOUT_MS/60000)+' minutes. '+text
+      : text;
+    finish(!timedOut && code===0 ? 'complete' : 'error',message.slice(-900));
+  });
   function finish(status,message){
     if(done) return;
     done=true;
     clearTimeout(timeout);
-    scan={status,message,completedAt:new Date().toISOString()};
+    scan={status,message,completedAt:new Date().toISOString(),mode:SCAN_MODE};
+    if(status==='error') {
+      // The service journal retains failures even when the dashboard restarts.
+      console.error('[Career Intelligence] scanner failed: '+message.replace(/[\u0000-\u001f\u007f]/g,' ').slice(-900));
+    }
   }
 }
 export function createServer() {

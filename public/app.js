@@ -78,6 +78,13 @@ function jobHtml(job) {
     + '<div class="job-score">'+score+statusSelect+'</div></article>';
 }
 function renderAudit() {
+  const scan=state.data.scan||{};
+  const error=$('scan-error');
+  error.hidden=scan.status!=='error';
+  error.textContent=error.hidden?'':'Scanner failure: '+String(scan.message||'Unknown failure').slice(-900);
+  $('scan-mode-note').textContent=scan.mode==='verified'
+    ? 'Verification mode: postings receive liveness checks, which may require Chromium on the server.'
+    : 'Discovery mode: jobs are imported without individual liveness verification. Confirm each listing on the employer website before applying.';
   const audit=state.data.audit||{};
   const latest=audit.latest;
   const coverage=audit.coverage;
