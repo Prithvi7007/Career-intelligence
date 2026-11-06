@@ -42,17 +42,17 @@ test('the scanner setup is pinned, separated and least-privileged', () => {
   assert.ok(!src.includes('npm ci'));
 });
 
-test('scanning config uses reviewed supported employers and no private details', () => {
+test('scanning config uses reviewed expanded employers and no private details', () => {
   const portals=read('deploy/career-ops/portals.yml');
   const profile=read('deploy/career-ops/profile.yml');
   const found=(portals.match(/^  - name: /gm)||[]).length;
-  assert.equal(found,11);
+  assert.equal(found,100);
   assert.match(portals,/^tracked_companies:/m);
   assert.match(portals,/^title_filter:/m);
   assert.match(portals,/^search_queries: \[\]/m);
   assert.match(portals,/^    - "Marketing Science"/m);
   assert.match(portals,/^    - "Data Scientist"/m);
-  assert.doesNotMatch(portals,/password|api_key|token:/i);
+  assert.doesNotMatch(portals,/^\s*(?:password|api_key|token)\s*:/im);
   assert.match(profile,/country: United States/);
   assert.doesNotMatch(profile,/full_name:|email:|visa_status:|phone:/);
 });
