@@ -1,0 +1,12 @@
+# Scanner-only starter configuration. This is not a job evaluation profile.
+# Complete your profile privately before enabling AI-based fit evaluations.
+location:
+  country: United States
+language:
+  output: en
+target_roles:
+  primary:
+    - "Data Scientist"
+    - "Marketing Science"
+    - "Applied Scientist"
+    - "Machine Learning Engineer"
