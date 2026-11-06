@@ -1,6 +1,6 @@
 const $ = id => document.getElementById(id);
 const state = {
-  data: { jobs: [], statuses: [], configured: false, scan: { status: 'idle' } },
+  data: { jobs: [], statuses: [], configured: false, scan: { status: 'idle' }, audit: {coverage:null,latest:null} },
   page: 'overview', search: '', stage: 'all', sort: 'recent', demo: false
 };
 const examples = [
@@ -77,7 +77,35 @@ function jobHtml(job) {
     + '<div class="tags">'+badge(job.status)+'<span class="pill">'+source+'</span>'+location+priority+'</div></div>'
     + '<div class="job-score">'+score+statusSelect+'</div></article>';
 }
+function renderAudit() {
+  const audit=state.data.audit||{};
+  const latest=audit.latest;
+  const coverage=audit.coverage;
+  const num=n=>Number.isFinite(n)?n.toLocaleString('en-US'):'—';
+  $('audit-configured').textContent=num(coverage?.companies);
+  $('audit-found').textContent=num(latest?.found);
+  $('audit-filtered').textContent=num(latest?.filtered);
+  $('audit-dupes').textContent=num(latest?.dupes);
+  $('audit-added').textContent=num(latest?.added);
+  $('audit-errors').textContent=num(latest?.errors);
+  if (!latest) {
+    $('audit-status').textContent=state.data.scan?.status==='running'?'Scan running':'No scan recorded';
+    $('audit-subtitle').textContent='Configured employer sources and the last recorded upstream scan.';
+    $('audit-details').textContent='Run Scan portals to see real coverage, exclusions, duplicates, source errors and new discoveries.';
+    return;
+  }
+  const when=new Date(latest.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  const running=state.data.scan?.status==='running';
+  $('audit-status').textContent=running?'Scan running · previous results':(latest.status==='failed'?'Last scan failed':'Last scan completed');
+  $('audit-subtitle').textContent='Last recorded attempt: '+when+' · '+latest.companies+' employers and '+latest.boards+' job boards attempted';
+  const breakdown=(latest.filters||[]).map(x=>x.label+': '+num(x.value)).join(' · ');
+  $('audit-details').textContent=(latest.status==='failed'?'Incomplete run; new-job count is intentionally unavailable. ':'')
+    +(breakdown||'No recorded filter exclusions')+'.'
+    +' Data reflects one scanner run; overall opportunities may include earlier discoveries.';
+}
+
 function render() {
+  renderAudit();
   const all = jobs();
   const total=all.length;
   const strong=all.filter(j => j.score!=null && j.score>=4).length;

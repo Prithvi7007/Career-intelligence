@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#090f1b">
   <title>Career Intelligence · Control Room</title>
   <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/audit.css">
   <script src="/app.js" defer></script>
 </head>
 <body>
@@ -39,6 +40,21 @@
         <article class="metric"><span class="metric-glyph mint">↗</span><h2>STRONG MATCHES</h2><strong id="strong">—</strong><p>Scored 4.0 / 5 or higher</p></article>
         <article class="metric"><span class="metric-glyph amber">◉</span><h2>IN PROCESS</h2><strong id="active">—</strong><p>Applied through interview</p></article>
         <article class="metric"><span class="metric-glyph blue">▧</span><h2>TO EVALUATE</h2><strong id="review">—</strong><p>Saved and newly discovered</p></article>
+      </section>
+      <section class="panel audit-panel" aria-labelledby="audit-heading">
+        <div class="audit-heading">
+          <div><div class="eyebrow">DISCOVERY TRANSPARENCY</div><h2 id="audit-heading">What the scanner actually found</h2><p id="audit-subtitle">Coverage, filtering and new results from the Career-Ops scan log.</p></div>
+          <span id="audit-status" class="audit-status">No scan recorded</span>
+        </div>
+        <div class="audit-grid">
+          <div><span>EMPLOYERS CONFIGURED</span><strong id="audit-configured">—</strong></div>
+          <div><span>POSTINGS FOUND</span><strong id="audit-found">—</strong></div>
+          <div><span>FILTERED OUT</span><strong id="audit-filtered">—</strong></div>
+          <div><span>DUPLICATES</span><strong id="audit-dupes">—</strong></div>
+          <div><span>NEW THIS SCAN</span><strong id="audit-added">—</strong></div>
+          <div><span>SCAN ERRORS</span><strong id="audit-errors">—</strong></div>
+        </div>
+        <p id="audit-details" class="audit-details">Run Scan portals to inspect the upstream job-discovery results. No scan counts are estimated.</p>
       </section>
       <div class="dashboard">
         <section class="panel main-panel">

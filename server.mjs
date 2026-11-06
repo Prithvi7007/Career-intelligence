@@ -5,14 +5,16 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { STATUSES, readCore, readLeads, writeLeads, normalizeLead, combine } from './core.mjs';
+import { readDiscoveryAudit } from './scan-audit.mjs';
 
 const HOME = path.dirname(fileURLToPath(import.meta.url));
 const HOST = process.env.HOST || '127.0.0.1';
 const PORT = Number(process.env.PORT || 3417);
 const DATA_FILE = path.resolve(process.env.CAREER_INTELLIGENCE_DATA || path.join(HOME, 'data/leads.json'));
 const ROOT = process.env.CAREER_OPS_ROOT ? path.resolve(process.env.CAREER_OPS_ROOT) : '';
+const SCAN_TIMEOUT_MS = Number(process.env.CAREER_SCAN_TIMEOUT_MS) > 0 ? Number(process.env.CAREER_SCAN_TIMEOUT_MS) : 1200000;
 const CODE = process.env.CAREER_OPS_CODE_ROOT ? path.resolve(process.env.CAREER_OPS_CODE_ROOT) : ROOT;
-const STATIC = { '/': ['index.html','text/html; charset=utf-8'], '/app.js': ['app.js','text/javascript; charset=utf-8'], '/style.css': ['style.css','text/css; charset=utf-8'] };
+const STATIC = { '/': ['index.html','text/html; charset=utf-8'], '/app.js': ['app.js','text/javascript; charset=utf-8'], '/style.css': ['style.css','text/css; charset=utf-8'], '/audit.css': ['audit.css','text/css; charset=utf-8'] };
 let scan = { status: 'idle', message: 'No scan started', completedAt: null };
 let writeQueue = Promise.resolve();
 
@@ -49,8 +51,8 @@ async function mutate(fn) {
   return run;
 }
 async function getState() {
-  const [core, leads] = await Promise.all([readCore(ROOT), readLeads(DATA_FILE)]);
-  return { configured:core.configured, jobs:combine(core,leads), scan, statuses:STATUSES };
+  const [core, leads, audit] = await Promise.all([readCore(ROOT), readLeads(DATA_FILE), readDiscoveryAudit(ROOT)]);
+  return { configured:core.configured, jobs:combine(core,leads), scan, audit, statuses:STATUSES };
 }
 function startScan() {
   scan = {status:'running', message:'Scanning configured portals...', completedAt:null};
@@ -61,7 +63,7 @@ function startScan() {
   const collect = data => {log=(log+data.toString()).slice(-3000);};
   child.stdout.on('data',collect);
   child.stderr.on('data',collect);
-  const timeout=setTimeout(()=>child.kill('SIGTERM'), 180000);
+  const timeout=setTimeout(()=>child.kill('SIGTERM'), SCAN_TIMEOUT_MS);
   child.on('error',e=>finish('error',e.message));
   child.on('close',code=>finish(code===0?'complete':'error',(log.trim()||('Scanner exited '+code)).slice(-650)));
   function finish(status,message){
