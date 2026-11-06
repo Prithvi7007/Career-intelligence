@@ -1,0 +1,37 @@
+[Unit]
+Description=Career Intelligence private dashboard
+After=network.target
+Documentation=https://github.com/Prithvi7007/Career-intelligence
+
+[Service]
+Type=simple
+User=career-intelligence
+Group=career-intelligence
+WorkingDirectory=/opt/career-intelligence
+ExecStart=@NODE_BINARY@ /opt/career-intelligence/server.mjs
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3417
+Environment=CAREER_INTELLIGENCE_DATA=/var/lib/career-intelligence/leads.json
+EnvironmentFile=-/etc/career-intelligence/config.env
+StateDirectory=career-intelligence
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
