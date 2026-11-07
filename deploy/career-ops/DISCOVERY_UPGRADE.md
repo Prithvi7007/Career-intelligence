@@ -20,10 +20,11 @@ are not presented as working sources.
 - A failed scan shows that status, and does not fabricate newly added jobs.
 - Filters are broken down by their recorded category.
 
-The scan command still includes --verify and --quiet. Its default timeout
-increases from three minutes to 20 minutes, suitable for a larger sweep.
-The timeout is configurable using CAREER_SCAN_TIMEOUT_MS in the private
-systemd environment.
+The scan command was initially configured with --verify and --quiet. An
+upcoming reliability change defaults to discovery-only because browser-based
+verification requires Chromium on the VPS. See SCAN_RECOVERY.md for the current
+setting, validation and recovery steps. The scan timeout is configurable with
+CAREER_SCAN_TIMEOUT_MS in the private systemd environment.
 
 ## Activate after merging the reviewed PR
 
